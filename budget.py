@@ -51,6 +51,27 @@ def aggregate_actual_spending(records: list[CategorizedRecord]) -> dict[str, flo
         totals[category_name] += float(record.get("amount", 0.0))
     return {key: round(value, 2) for key, value in totals.items()}
 
+def validate_category(name: str, info: dict[str, Any], existing_names: set[str]) -> list[str]:
+    
+    errors = []
+    if not name:
+        errors.append("Category name cannot be blank.")
+    if info.get("tier") not in VALID_TIERS:
+        errors.append("Tier must be Needs, Wants, or Savings.")
+    try:
+        if float(info.get("weight", 0)) < 0:
+            errors.append("Weight cannot be negative.")
+    except (TypeError, ValueError):
+        errors.append("Weight has to be numeric.")
+    try:
+        priority = int(info.get("priority", 0))
+        if priority < 1 or priority > 10:
+            errors.append("Priority should be from 1 to 10.")
+    except (TypeError, ValueError):
+        errors.append("Priority has to be a whole number.")
+    if name in existing_names:
+        errors.append("Duplicate category names are not allowed.")
+    return errors
 
 
 
