@@ -211,6 +211,52 @@ def build_zero_based_suggestion(income: float, categories: dict[str, BudgetCateg
 
     return allocations
 
+def allocate_zero_based(
+    income: float,
+    categories: dict[str, BudgetCategoryProfile],
+    manual_amounts: dict[str, Any] | None = None,
+) -> BudgetAllocation:
+
+    if income < 0:
+        raise ValueError("Income cannot be negative.")
+    categories = deepcopy(categories)
+    allocations: dict[str, float] = {}
+    warnings: list[str] = []
+
+    source_amounts = manual_amounts if manual_amounts is not None else build_zero_based_suggestion(income, categories)
+    if manual_amounts is not None:
+        unknown_keys = set(manual_amounts) - set(categories)
+        if unknown_keys:
+            warnings.append(
+                f"Ignored amounts for unknown categories: {', '.join(sorted(unknown_keys))}."
+            )
+    remaining = round(income, 2)
+
+    for name in categories:
+        amount = round(float(source_amounts.get(name, 0.0)), 2)
+        if amount < 0:
+            raise ValueError("Zero-based budgeting does not allow negative assigned amounts.")
+        if amount > remaining:
+            raise ValueError(f"{name} would overshoot the remaining budget.")
+        allocations[name] = amount
+        categories[name]["budgeted_amount"] = amount
+        remaining = round(remaining - amount, 2)
+
+    if remaining != 0:
+        warnings.append(f"Zero-based plan left {format_money(remaining)} unassigned.")
+
+    return cast(
+        BudgetAllocation,
+        {
+            "strategy": "Zero Based",
+            "allocations": allocations,
+            "categories": categories,
+            "allocated_total": round(sum(allocations.values()), 2),
+            "remaining": remaining,
+            "warnings": warnings,
+        },
+    )
+
 
 
 
