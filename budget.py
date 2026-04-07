@@ -332,6 +332,19 @@ def compare_actual_to_budget(
         },
     )
 
+def donor_allowed(overage_row: BudgetComparisonRow, candidate_row: BudgetComparisonRow) -> bool:
+
+    if candidate_row["status"] != "UNDER":
+        return False
+    if candidate_row["category"] == overage_row["category"]:
+        return False
+    if candidate_row["tier"] == overage_row["tier"] and candidate_row["priority"] <= overage_row["priority"]:
+        return True
+    if overage_row["tier"] == "Needs" and candidate_row["tier"] == "Wants":
+        return True
+    return False
+
+
 
 
 
