@@ -109,6 +109,39 @@ def distribute_pool_by_weight(
         allocations[name] = max(0.0, amount)
     return allocations, warnings
 
+def allocate_fifty_thirty_twenty(income: float, categories: dict[str, BudgetCategoryProfile]) -> BudgetAllocation:
+
+    if income < 0:
+        raise ValueError("Income cannot be negative.")
+    categories = deepcopy(categories)
+    tier_pools = {"Needs": income * 0.50, "Wants": income * 0.30, "Savings": income * 0.20}
+    warnings = []
+    allocations: dict[str, float] = {}
+
+    for tier_name, pool in tier_pools.items():
+        tier_names = [name for name, info in categories.items() if info["tier"] == tier_name]
+        if not tier_names:
+            warnings.append(f"The {tier_name} tier had no categories, so its pool stayed unassigned.")
+            continue
+        tier_allocations, pool_warnings = distribute_pool_by_weight(tier_names, categories, round(pool, 2))
+        warnings.extend(pool_warnings)
+        allocations.update(tier_allocations)
+
+    allocated_total = sum(allocations.values())
+    for name, amount in allocations.items():
+        categories[name]["budgeted_amount"] = amount
+
+    return cast(
+        BudgetAllocation,
+        {
+            "strategy": "50/30/20",
+            "allocations": allocations,
+            "categories": categories,
+            "allocated_total": round(allocated_total, 2),
+            "remaining": round(income - allocated_total, 2),
+            "warnings": warnings,
+        },
+    )
 
 
 
