@@ -40,6 +40,16 @@ def starter_categories() -> dict[str, BudgetCategoryProfile]:
         },
     )
 
+def aggregate_actual_spending(records: list[CategorizedRecord]) -> dict[str, float]:
+    
+    totals: dict[str, float] = {}
+    for record in records:
+        raw = str(record.get("subcategory") or record.get("category") or "Unknown")
+        category_name = normalize_actual_spending_category(raw)
+        if category_name not in totals:
+            totals[category_name] = 0.0
+        totals[category_name] += float(record.get("amount", 0.0))
+    return {key: round(value, 2) for key, value in totals.items()}
 
 
 
