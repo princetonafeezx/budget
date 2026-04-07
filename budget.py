@@ -264,6 +264,18 @@ def compare_strategies(income: float, categories: dict[str, BudgetCategoryProfil
         "Zero Based": allocate_zero_based(income, categories),
     }
 
+def compare_actual_to_budget(
+    allocation: BudgetAllocation, actual_spending: dict[str, Any]
+) -> BudgetComparisonResult:
+
+    alloc = allocation["allocations"]
+    cats = allocation["categories"]
+    all_names = sorted(set(alloc) | set(actual_spending.keys()))
+    rows: list[BudgetComparisonRow] = []
+    total_actual = 0.0
+    total_budgeted = 0.0
+    overages: set[str] = set()
+    under_budget: set[str] = set()
 
 
 
