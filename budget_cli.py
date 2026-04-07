@@ -152,3 +152,94 @@ def enter_actual_spending(categories: dict[str, BudgetCategoryProfile]) -> dict[
             print("That number was invalid, so I used 0 instead.")
             actuals[name] = 0.0
     return actuals
+
+def menu() -> None:
+    income = 0.0
+    categories = budget.starter_categories()
+    actual_spending: dict[str, float] = {}
+    last_allocation: BudgetAllocation | None = None
+    valid_choices = {"1", "2", "3", "4", "5", "6"}
+
+    while True:
+        print()
+        print("LedgerLogic: Priority-Based Budget Distributor")
+        print("1. Set income")
+        print("2. Manage categories")
+        print("3. Run a strategy")
+        print("4. Run all strategies and compare")
+        print("5. Enter actual spending / view comparison")
+        print("6. Quit")
+        choice = input("Choose an option: ").strip()
+        if choice not in valid_choices:
+            print("Please choose a valid menu number.")
+            continue
+
+        if choice == "1":
+            new_income = prompt_float("Monthly income: ", allow_zero=True)
+            if new_income is not None:
+                income = new_income
+                print(f"Income is now {format_money(income)}.")
+
+        elif choice == "2":
+            print("a. Add category")
+            print("b. Edit category")
+            print("c. Remove category")
+            print("d. View categories")
+            sub = input("Choice: ").strip().lower()
+            if sub == "a":
+                add_category(categories)
+            elif sub == "b":
+                edit_category(categories)
+            elif sub == "c":
+                remove_category(categories)
+            elif sub == "d":
+                for name, info in categories.items():
+                    print(f"{name:<18}{info['tier']:<10}{info['weight']:>6}{info['priority']:>6}")
+            else:
+                print("That category option was not recognized.")
+
+        elif choice == "3":
+            if not categories:
+                print("Please add at least one category first.")
+                continue
+            if income == 0:
+                print("Income is zero, so the plan will be all zeros unless you change it.")
+            print("a. 50/30/20")
+            print("b. Priority weighted")
+            print("c. Zero based")
+            sub = input("Strategy: ").strip().lower()
+            try:
+                if sub == "a":
+                    last_allocation = budget.allocate_fifty_thirty_twenty(income, categories)
+                elif sub == "b":
+                    last_allocation = budget.allocate_priority_weighted(income, categories)
+                elif sub == "c":
+                    last_allocation = budget.allocate_zero_based(income, categories)
+                else:
+                    print("That strategy key was not recognized.")
+                    continue
+                print_allocation_table(last_allocation)
+            except ValueError as error:
+                print(f"Could not run strategy: {error}")
+
+        elif choice == "4":
+            if not categories:
+                print("Please add categories first.")
+                continue
+            try:
+                results = budget.compare_strategies(income, categories)
+                print_strategy_comparison_table(results)
+            except ValueError as error:
+                print(f"Could not compare strategies: {error}")
+
+        elif choice == "5":
+            if last_allocation is None:
+                print("Run a strategy first so there is a budget to compare against.")
+                continue
+            actual_spending = enter_actual_spending(categories)
+            comparison = budget.compare_actual_to_budget(last_allocation, actual_spending)
+            print_comparison_report(comparison, income)
+
+        elif choice == "6":
+            print("Exiting budget allocator.")
+            break
