@@ -147,3 +147,22 @@ def save_json(data: dict[str, Any], path: str | Path) -> Path:
 
     _atomic_write_file(output_path, write_json)
     return output_path
+
+def load_json(path: str | Path, default: dict[str, Any] | None = None) -> dict[str, Any]:
+    input_path = Path(path)
+    if not input_path.exists():
+        return {} if default is None else default
+    fallback = {} if default is None else default
+    try:
+        with input_path.open("r", encoding="utf-8") as handle:
+            raw = json.load(handle)
+    except json.JSONDecodeError as exc:
+        warnings.warn(f"Invalid JSON in {input_path}: {exc}; using default.", stacklevel=2)
+        return fallback.copy()
+    if not isinstance(raw, dict):
+        warnings.warn(
+            f"JSON in {input_path} is not an object (got {type(raw).__name__}); using default.",
+            stacklevel=2,
+        )
+        return fallback.copy()
+    return cast(dict[str, Any], raw)
