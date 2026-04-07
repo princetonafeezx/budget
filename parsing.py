@@ -29,5 +29,11 @@ def parse_amount(amount_text: str) -> float:
         .replace("\xa0", "")
         .replace("\u202f", "")
         .strip()
-        
+
     )
+    if not cleaned:
+        raise ValueError("Blank amount")
+    if "e" in cleaned.lower(): 
+        raise ValueError( 
+
+        
