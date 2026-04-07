@@ -98,3 +98,57 @@ def add_category(categories: dict[str, BudgetCategoryProfile]) -> None:
         return
     categories[name] = cast(BudgetCategoryProfile, info)
     print(f"Added {name}.")
+# 
+def edit_category(categories: dict[str, BudgetCategoryProfile]) -> None:
+    name = input("Category to edit: ").strip()
+    if name not in categories:
+        print("That category was not found.")
+        return
+    info = categories[name]
+    new_tier = input(f"Tier [{info['tier']}]: ").strip().title() or info["tier"]
+    new_weight_text = input(f"Weight [{info['weight']}]: ").strip()
+    new_priority_text = input(f"Priority [{info['priority']}]: ").strip()
+    try:
+        updated = {
+            "tier": new_tier,
+            "weight": float(new_weight_text) if new_weight_text else float(info["weight"]),
+            "priority": int(new_priority_text) if new_priority_text else int(info["priority"]),
+            "actual_spend": float(info["actual_spend"]),
+            "budgeted_amount": float(info["budgeted_amount"]),
+        }
+    except ValueError:
+        print("Weight and priority have to stay numeric.")
+        return
+    errors = budget.validate_category(name, updated, set(categories) - {name})
+    if errors:
+        for error in errors:
+            print(error)
+        return
+    categories[name] = cast(BudgetCategoryProfile, updated)
+    print(f"Updated {name}.")
+
+def remove_category(categories: dict[str, BudgetCategoryProfile]) -> None:
+    name = input("Category to remove: ").strip()
+    if name in categories:
+        categories.pop(name)
+        print(f"Removed {name}.")
+    else:
+        print("That category was not found.")
+
+def enter_actual_spending(categories: dict[str, BudgetCategoryProfile]) -> dict[str, float]:
+    actuals: dict[str, float] = {}
+    for name in categories:
+        entered = input(f"Actual spending for {name} [0]: ").strip()
+        if not entered:
+            actuals[name] = 0.0
+            continue
+        try:
+            amount = float(entered)
+            if amount < 0:
+                print("Negative actual spending is not allowed, so I used 0 instead.")
+                amount = 0.0
+            actuals[name] = amount
+        except ValueError:
+            print("That number was invalid, so I used 0 instead.")
+            actuals[name] = 0.0
+    return actuals
