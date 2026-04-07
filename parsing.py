@@ -14,3 +14,9 @@ def parse_date(date_text: str) -> date:
         "%d/%m/%Y", 
         "%d/%m/%y", 
     ]
+    for pattern in patterns: 
+        try: 
+            return datetime.strptime(raw, pattern).date()
+        except ValueError: 
+            continue 
+    raise ValueError(f"Unsupported date format: {date_text}") 
