@@ -73,7 +73,15 @@ def validate_category(name: str, info: dict[str, Any], existing_names: set[str])
         errors.append("Duplicate category names are not allowed.")
     return errors
 
-
+def apply_actual_spending(
+    categories: dict[str, BudgetCategoryProfile], actual_spending: dict[str, Any] | None
+) -> dict[str, BudgetCategoryProfile]:
+    
+    categories = deepcopy(categories)
+    actual_spending = actual_spending or {}
+    for name, info in categories.items():
+        info["actual_spend"] = round(float(actual_spending.get(name, 0.0)), 2)
+    return categories
 
 
 
