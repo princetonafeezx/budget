@@ -53,3 +53,8 @@ def parse_amount(amount_text: str) -> float:
     except InvalidOperation as exc: 
         raise ValueError(f"Invalid amount: {amount_text!r}") from exc
 
+    rounded = decimal_amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    amount = float(rounded) 
+    if negative: 
+        amount = -amount 
+    return abs(amount)
