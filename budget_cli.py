@@ -64,3 +64,37 @@ def print_comparison_report(comparison: BudgetComparisonResult, income: float) -
         for suggestion in suggestions:
             donor_text = ", ".join(f"{item['from']} {format_money(item['amount'])}" for item in suggestion["donors"])
             print(f"{suggestion['category']} could absorb {format_money(suggestion['needed'])} from {donor_text}")
+
+def prompt_float(prompt: str, allow_zero: bool = True) -> float | None:
+    entered = input(prompt).strip()
+    try:
+        value = float(entered)
+    except ValueError:
+        print("Please enter a numeric value.")
+        return None
+    if value < 0:
+        print("Negative values are not allowed here.")
+        return None
+    if value == 0 and not allow_zero:
+        print("Zero is not allowed for this field.")
+        return None
+    return value
+
+def add_category(categories: dict[str, BudgetCategoryProfile]) -> None:
+    existing: set[str] = set(categories)
+    name = input("Category name: ").strip()
+    tier = input("Tier (Needs/Wants/Savings): ").strip().title()
+    weight = input("Weight: ").strip()
+    priority = input("Priority 1-10: ").strip()
+    try:
+        info = {"tier": tier, "weight": float(weight), "priority": int(priority), "actual_spend": 0.0, "budgeted_amount": 0.0}
+    except ValueError:
+        print("Weight and priority have to be numeric.")
+        return
+    errors = budget.validate_category(name, info, existing)
+    if errors:
+        for error in errors:
+            print(error)
+        return
+    categories[name] = cast(BudgetCategoryProfile, info)
+    print(f"Added {name}.")
