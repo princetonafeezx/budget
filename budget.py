@@ -370,20 +370,6 @@ def build_redistribution_suggestions(comparison: BudgetComparisonResult) -> list
             suggestions.append({"category": overage_row["category"], "needed": overage_row["difference"], "donors": donors})
     return suggestions
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def menu() -> None:
     try:
         from .budget_cli import menu as cli_menu
