@@ -88,3 +88,52 @@ def save_categorized_transactions(
 
     _atomic_write_file(output_path, write_csv)
     return output_path
+
+def load_categorized_transactions(path: str | Path | None = None) -> tuple[list[dict[str, Any]], list[str]]:
+    
+
+    input_path = Path(path) if path else get_categorized_path()
+    if not input_path.exists():
+        return [], []
+
+    records: list[dict[str, Any]] = []
+    load_warnings: list[str] = []
+    with input_path.open("r", newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle)
+        for row_index, row in enumerate(reader, start=2):
+            if not row:
+                continue
+            if not any((v or "").strip() for v in row.values()):
+                continue
+            amount_cell = (row.get("amount") or "").strip()
+            if not amount_cell:
+                amount = 0.0
+            else:
+                try:
+                    amount = parse_amount(amount_cell)
+                except ValueError:
+                    load_warnings.append(
+                        f"CSV row {row_index}: could not parse amount {amount_cell!r}; using 0.00."
+                    )
+                    amount = 0.0
+            confidence_text = row.get("confidence", "") or "0"
+            try:
+                confidence = float(confidence_text)
+            except ValueError:
+                load_warnings.append(
+                    f"CSV row {row_index}: could not parse confidence {confidence_text!r}; using 0.0."
+                )
+                confidence = 0.0
+
+            records.append(
+                {
+                    "date": row.get("date", ""),
+                    "merchant": row.get("merchant", ""),
+                    "amount": amount,
+                    "category": row.get("category", "Unknown"),
+                    "subcategory": row.get("subcategory", "Unknown"),
+                    "confidence": confidence,
+                    "match_type": row.get("match_type", "unknown"),
+                }
+            )
+    return records, load_warnings
