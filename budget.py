@@ -19,6 +19,18 @@ TIER_RANK = {"Needs": 0, "Wants": 1, "Savings": 2}
 
 ACTUAL_SPEND_CATEGORY_ALIASES: dict[str, str] = {"Health": "Insurance"}
 
+def normalize_actual_spending_category(raw_name: str) -> str:
+    return ACTUAL_SPEND_CATEGORY_ALIASES.get(raw_name, raw_name)
+
+
+
+
+
+
+
+
+
+
 
 
 
