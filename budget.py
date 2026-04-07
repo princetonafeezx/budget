@@ -318,6 +318,20 @@ def compare_actual_to_budget(
             )
         )
 
+    rows.sort(key=lambda item: (item["status"] != "OVER", -abs(item["difference"])))
+    return cast(
+        BudgetComparisonResult,
+        {
+            "rows": rows,
+            "overages": overages,
+            "under_budget": under_budget,
+            "total_overage": round(sum(max(0.0, row["difference"]) for row in rows), 2),
+            "total_surplus": round(sum(max(0.0, -row["difference"]) for row in rows), 2),
+            "total_actual": round(total_actual, 2),
+            "total_budgeted": round(total_budgeted, 2),
+        },
+    )
+
 
 
 
