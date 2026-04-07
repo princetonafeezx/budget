@@ -180,6 +180,37 @@ def allocate_priority_weighted(income: float, categories: dict[str, BudgetCatego
         },
     )
 
+def build_zero_based_suggestion(income: float, categories: dict[str, BudgetCategoryProfile]) -> dict[str, float]:
+
+    ordered_names = sorted(
+        categories,
+        key=lambda name: (
+            TIER_RANK.get(str(categories[name]["tier"]), 99),
+            -int(categories[name]["priority"]),
+            -float(categories[name]["weight"]),
+        ),
+    )
+    remaining = round(income, 2)
+    allocations: dict[str, float] = {}
+    assigned: set[str] = set()
+
+    total_priority = sum(int(info["priority"]) for info in categories.values()) or 1
+    for index, name in enumerate(ordered_names, start=1):
+        if name in assigned:
+            continue
+        if index == len(ordered_names):
+            amount = remaining
+        else:
+            share = int(categories[name]["priority"]) / total_priority
+            amount = round(income * share, 2)
+            if amount > remaining:
+                amount = remaining
+        allocations[name] = max(0.0, amount)
+        remaining = round(remaining - allocations[name], 2)
+        assigned.add(name)
+
+    return allocations
+
 
 
 
