@@ -143,6 +143,47 @@ def allocate_fifty_thirty_twenty(income: float, categories: dict[str, BudgetCate
         },
     )
 
+def allocate_priority_weighted(income: float, categories: dict[str, BudgetCategoryProfile]) -> BudgetAllocation:
+
+    if income < 0:
+        raise ValueError("Income cannot be negative.")
+    categories = deepcopy(categories)
+    allocations: dict[str, float] = {}
+    total_priority = 0
+    for info in categories.values():
+        total_priority += int(info["priority"])
+
+    if total_priority == 0:
+        raise ValueError("Priority scores cannot sum to zero.")
+
+    running_total = 0.0
+    names = list(categories)
+    for index, name in enumerate(names, start=1):
+        if index == len(names):
+            amount = round(income - running_total, 2)
+        else:
+            share = int(categories[name]["priority"]) / total_priority
+            amount = round(income * share, 2)
+            running_total += amount
+        allocations[name] = max(0.0, amount)
+        categories[name]["budgeted_amount"] = allocations[name]
+
+    return cast(
+        BudgetAllocation,
+        {
+            "strategy": "Priority Weighted",
+            "allocations": allocations,
+            "categories": categories,
+            "allocated_total": round(sum(allocations.values()), 2),
+            "remaining": round(income - sum(allocations.values()), 2),
+            "warnings": [],
+        },
+    )
+
+
+
+
+
 
 
 
