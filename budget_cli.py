@@ -34,3 +34,33 @@ def print_strategy_comparison_table(results: dict[str, BudgetAllocation]) -> Non
         for _strategy_name, result in results.items():
             line += f"{format_money(result['allocations'].get(category, 0.0)):>18}"
         print(line)
+
+def print_comparison_report(comparison: BudgetComparisonResult, income: float) -> None:
+    print(f"{'Category':<18}{'Budgeted':>14}{'Actual':>14}{'Difference':>14}{'Status':>10}")
+    print("-" * 70)
+    for row in comparison["rows"]:
+        marker = "**" if row["status"] == "OVER" else ""
+        pct = row["percentage_of_budget"]
+        detail = f"{pct:.0f}%" if pct is not None else "n/a"
+        print(
+            f"{row['category']:<18}"
+            f"{format_money(row['budgeted']):>14}"
+            f"{format_money(row['actual']):>14}"
+            f"{format_money(row['difference']):>14}"
+            f"{(marker + row['status'] + ' ' + detail):>10}"
+        )
+
+    print("-" * 70)
+    print(f"Total income: {format_money(income)}")
+    print(f"Total budgeted: {format_money(comparison['total_budgeted'])}")
+    print(f"Total spent: {format_money(comparison['total_actual'])}")
+    print(f"Total overage: {format_money(comparison['total_overage'])}")
+    print(f"Total surplus: {format_money(comparison['total_surplus'])}")
+
+    suggestions = budget.build_redistribution_suggestions(comparison)
+    if suggestions:
+        print()
+        print("Redistribution suggestions")
+        for suggestion in suggestions:
+            donor_text = ", ".join(f"{item['from']} {format_money(item['amount'])}" for item in suggestion["donors"])
+            print(f"{suggestion['category']} could absorb {format_money(suggestion['needed'])} from {donor_text}")
