@@ -37,7 +37,6 @@ def parse_amount(amount_text: str) -> float:
         raise ValueError( 
 
     negative = False 
-    
     if cleaned.startswith("(") and cleaned.endswith(")"): 
         negative = True 
         cleaned = cleaned[1:-1].strip() 
@@ -47,4 +46,10 @@ def parse_amount(amount_text: str) -> float:
         negative = True 
         cleaned = cleaned[1:].strip() 
     if not cleaned: 
-        raise ValueError("Blank amount") 
+        raise ValueError("Blank amount")
+
+    try:
+        decimal_amount = Decimal(cleaned)
+    except InvalidOperation as exc: 
+        raise ValueError(f"Invalid amount: {amount_text!r}") from exc
+
