@@ -48,3 +48,22 @@ def get_data_dir(base_dir: str | Path | None = None) -> Path:
             root = Path.cwd() / "ledgerlogic_data"
     root.mkdir(parents=True, exist_ok=True)
     return root
+
+def get_categorized_path(base_dir: str | Path | None = None) -> Path:
+    return get_data_dir(base_dir) / "categorized_transactions.csv"
+
+def get_budget_profile_path(base_dir: str | Path | None = None) -> Path:
+    return get_data_dir(base_dir) / "budget_profile.json"
+
+
+def get_investment_profile_path(base_dir: str | Path | None = None) -> Path:
+    return get_data_dir(base_dir) / "investment_scenarios.json"
+
+
+def get_report_path(base_dir: str | Path | None = None) -> Path:
+    return get_data_dir(base_dir) / "ledgerlogic_report.txt"
+
+
+def format_money(amount: float) -> str:
+    """Format a number as dollars."""
+    return f"${amount:,.2f}"
