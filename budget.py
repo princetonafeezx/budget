@@ -257,7 +257,12 @@ def allocate_zero_based(
         },
     )
 
-
+def compare_strategies(income: float, categories: dict[str, BudgetCategoryProfile]) -> dict[str, BudgetAllocation]:
+    return {
+        "50/30/20": allocate_fifty_thirty_twenty(income, categories),
+        "Priority Weighted": allocate_priority_weighted(income, categories),
+        "Zero Based": allocate_zero_based(income, categories),
+    }
 
 
 
