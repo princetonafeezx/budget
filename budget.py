@@ -277,7 +277,46 @@ def compare_actual_to_budget(
     overages: set[str] = set()
     under_budget: set[str] = set()
 
+    for name in all_names:
+        budgeted_amount = round(float(alloc.get(name, 0.0)), 2)
+        actual = round(float(actual_spending.get(name, 0.0)), 2)
+        difference = round(actual - budgeted_amount, 2)
+        total_actual += actual
+        total_budgeted += budgeted_amount
 
+        if budgeted_amount == 0:
+            percentage_of_budget: float | None = None
+        else:
+            percentage_of_budget = (actual / budgeted_amount) * 100
+
+        if actual > budgeted_amount:
+            status = "OVER"
+            overages.add(name)
+        elif actual < budgeted_amount:
+            status = "UNDER"
+            under_budget.add(name)
+        else:
+            status = "EVEN"
+
+        profile = cats.get(name)
+        tier = profile["tier"] if profile else "Unknown"
+        priority = int(profile["priority"]) if profile else 0
+
+        rows.append(
+            cast(
+                BudgetComparisonRow,
+                {
+                    "category": name,
+                    "budgeted": round(budgeted_amount, 2),
+                    "actual": actual,
+                    "difference": difference,
+                    "percentage_of_budget": percentage_of_budget,
+                    "status": status,
+                    "tier": tier,
+                    "priority": priority,
+                },
+            )
+        )
 
 
 
