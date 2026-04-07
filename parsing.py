@@ -36,4 +36,15 @@ def parse_amount(amount_text: str) -> float:
     if "e" in cleaned.lower(): 
         raise ValueError( 
 
-        
+    negative = False 
+    
+    if cleaned.startswith("(") and cleaned.endswith(")"): 
+        negative = True 
+        cleaned = cleaned[1:-1].strip() 
+    if cleaned.startswith("+"): 
+        cleaned = cleaned[1:].strip()
+    if cleaned.startswith("-"): 
+        negative = True 
+        cleaned = cleaned[1:].strip() 
+    if not cleaned: 
+        raise ValueError("Blank amount") 
