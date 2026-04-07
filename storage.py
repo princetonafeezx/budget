@@ -67,3 +67,24 @@ def get_report_path(base_dir: str | Path | None = None) -> Path:
 def format_money(amount: float) -> str:
     """Format a number as dollars."""
     return f"${amount:,.2f}"
+
+# 
+def save_categorized_transactions(
+    records: Sequence[CategorizedRecord],
+    path: str | Path | None = None,
+) -> Path:
+
+    output_path = Path(path) if path else get_categorized_path()
+
+    def write_csv(tmp: Path) -> None:
+        with tmp.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=CATEGORIZED_FIELDS)
+            writer.writeheader()
+            for record in records:
+                row: dict[str, Any] = {}
+                for field in CATEGORIZED_FIELDS:
+                    row[field] = record.get(field, "")
+                writer.writerow(row)
+
+    _atomic_write_file(output_path, write_csv)
+    return output_path
