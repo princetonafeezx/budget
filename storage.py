@@ -91,7 +91,6 @@ def save_categorized_transactions(
 
 def load_categorized_transactions(path: str | Path | None = None) -> tuple[list[dict[str, Any]], list[str]]:
     
-
     input_path = Path(path) if path else get_categorized_path()
     if not input_path.exists():
         return [], []
@@ -137,3 +136,14 @@ def load_categorized_transactions(path: str | Path | None = None) -> tuple[list[
                 }
             )
     return records, load_warnings
+
+def save_json(data: dict[str, Any], path: str | Path) -> Path:
+
+    output_path = Path(path)
+
+    def write_json(tmp: Path) -> None:
+        with tmp.open("w", encoding="utf-8") as handle:
+            json.dump(data, handle, indent=2)
+
+    _atomic_write_file(output_path, write_json)
+    return output_path
