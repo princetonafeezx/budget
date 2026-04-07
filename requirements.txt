@@ -1,0 +1,7 @@
+# Logic & Types
+typing-extensions
+
+# Quality Control (Development)
+mypy
+black
+flake8
