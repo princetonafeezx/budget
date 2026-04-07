@@ -166,3 +166,12 @@ def load_json(path: str | Path, default: dict[str, Any] | None = None) -> dict[s
         )
         return fallback.copy()
     return cast(dict[str, Any], raw)
+
+def write_text_report(text: str, path: str | Path | None = None) -> Path:
+    output_path = Path(path) if path else get_report_path()
+
+    def write_txt(tmp: Path) -> None:
+        tmp.write_text(text, encoding="utf-8")
+
+    _atomic_write_file(output_path, write_txt)
+    return output_path
