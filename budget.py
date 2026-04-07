@@ -344,7 +344,31 @@ def donor_allowed(overage_row: BudgetComparisonRow, candidate_row: BudgetCompari
         return True
     return False
 
+def build_redistribution_suggestions(comparison: BudgetComparisonResult) -> list[dict[str, Any]]:
 
+    suggestions: list[dict[str, Any]] = []
+    rows = comparison["rows"]
+    for overage_row in rows:
+        if overage_row["status"] != "OVER":
+            continue
+        needed = overage_row["difference"]
+        donors = []
+        for candidate_row in rows:
+            if not donor_allowed(overage_row, candidate_row):
+                continue
+            available = abs(min(0.0, candidate_row["difference"]))
+            if available <= 0:
+                continue
+            amount = min(needed, available)
+            if amount > 0:
+                donors.append({"from": candidate_row["category"], "amount": round(amount, 2)})
+                needed = round(needed - amount, 2)
+            if needed <= 0:
+                break
+
+        if donors:
+            suggestions.append({"category": overage_row["category"], "needed": overage_row["difference"], "donors": donors})
+    return suggestions
 
 
 
