@@ -37,3 +37,14 @@ def _atomic_write_file(path: Path, write: Callable[[Path], None]) -> None:
         tmp.unlink(missing_ok=True)
         raise
 
+def get_data_dir(base_dir: str | Path | None = None) -> Path:  
+    if base_dir is not None:
+        root = Path(base_dir)
+    else:
+        env = (os.environ.get("LEDGERLOGIC_DATA_DIR") or "").strip()
+        if env:
+            root = Path(env).expanduser()
+        else:
+            root = Path.cwd() / "ledgerlogic_data"
+    root.mkdir(parents=True, exist_ok=True)
+    return root
