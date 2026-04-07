@@ -4,3 +4,13 @@ import datetime
 from datetime import date, datetime
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
+def parse_date(date_text: str) -> date:
+    raw = date_text.strip()
+    patterns = [ 
+        "%Y-%m-%d", 
+        "%m/%d/%Y", 
+        "%m/%d/%y", 
+        "%Y/%m/%d", 
+        "%d/%m/%Y", 
+        "%d/%m/%y", 
+    ]
