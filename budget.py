@@ -83,7 +83,31 @@ def apply_actual_spending(
         info["actual_spend"] = round(float(actual_spending.get(name, 0.0)), 2)
     return categories
 
+def distribute_pool_by_weight(
+    category_names: list[str], categories: dict[str, BudgetCategoryProfile], pool_amount: float
+) -> tuple[dict[str, float], list[str]]:
+    warnings = []
+    allocations: dict[str, float] = {}
+    total_weight = 0.0
+    for name in category_names:
+        total_weight += float(categories[name]["weight"])
 
+    if total_weight == 0:
+        warnings.append("Weights summed to zero for one allocation pool, so nothing was assigned there.")
+        for name in category_names:
+            allocations[name] = 0.0
+        return allocations, warnings
+
+    running_total = 0.0
+    for index, name in enumerate(category_names, start=1):
+        if index == len(category_names):
+            amount = round(pool_amount - running_total, 2)
+        else:
+            share = float(categories[name]["weight"]) / total_weight
+            amount = round(pool_amount * share, 2)
+            running_total += amount
+        allocations[name] = max(0.0, amount)
+    return allocations, warnings
 
 
 
