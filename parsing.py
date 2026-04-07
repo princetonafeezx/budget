@@ -20,3 +20,14 @@ def parse_date(date_text: str) -> date:
         except ValueError: 
             continue 
     raise ValueError(f"Unsupported date format: {date_text}") 
+
+def parse_amount(amount_text: str) -> float:
+    original = (amount_text or "").strip() 
+    cleaned = ( 
+        original.replace("$", "") 
+        .replace(",", "") 
+        .replace("\xa0", "")
+        .replace("\u202f", "")
+        .strip()
+        
+    )
