@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # Virtual Environments
+.venv/
 venv/
 env/
 .env/
@@ -19,7 +20,13 @@ build/
 
 # Unit test / coverage
 .coverage
+.coverage.*
 .pytest_cache/
+htmlcov/
+.hypothesis/
+
+# Static type checker cache
+.mypy_cache/
 
 # IDEs and Editors
 .vscode/

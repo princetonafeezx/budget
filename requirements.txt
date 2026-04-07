@@ -1,7 +1,10 @@
-# Logic & Types
+# Runtime
 typing-extensions
 
-# Quality Control (Development)
+# Test
+pytest
+
+# Development
 mypy
 black
 flake8
