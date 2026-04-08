@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/investment_scenarios.schema.json",
+  "title": "Investment Scenarios",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InvestmentScenario"
+      }
+    }
+  },
+  "required": ["scenarios"],
+  "$defs": {
+    "InvestmentScenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "initial_principal": {
+          "type": "number",
+          "minimum": 0
+        },
+        "annual_rate": {
+          "type": "number"
+        },
+        "years": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "compounding": {
+          "type": "string",
+          "enum": ["monthly", "annual"]
+        },
+        "contribution_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "contribution_frequency": {
+          "type": "string",
+          "enum": ["monthly", "annual"]
+        },
+        "contribution_timing": {
+          "type": "string",
+          "enum": ["start", "end"]
+        },
+        "inflation_rate": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "initial_principal",
+        "annual_rate",
+        "years",
+        "compounding",
+        "contribution_amount",
+        "contribution_frequency",
+        "contribution_timing",
+        "inflation_rate"
+      ]
+    }
+  }
+}

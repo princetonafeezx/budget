@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/budget_profile.schema.json",
+  "title": "Budget Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "income": {
+      "type": "number",
+      "minimum": 0
+    },
+    "categories": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/BudgetCategoryProfile"
+      }
+    },
+    "actual_spending": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "last_strategy": {
+      "type": "string",
+      "enum": ["50/30/20", "Priority Weighted", "Zero Based"]
+    }
+  },
+  "required": ["income", "categories"],
+  "$defs": {
+    "BudgetCategoryProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": ["Needs", "Wants", "Savings"]
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "actual_spend": {
+          "type": "number",
+          "minimum": 0
+        },
+        "budgeted_amount": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": ["tier", "weight", "priority", "actual_spend", "budgeted_amount"]
+    }
+  }
+}

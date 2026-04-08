@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/categorized_transactions.schema.json",
+  "title": "Categorized Transactions Export",
+  "description": "JSON representation of rows equivalent to categorized_transactions.csv.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "date": {
+        "type": "string",
+        "description": "Date string as stored by the app, e.g. YYYY-MM-DD."
+      },
+      "merchant": {
+        "type": "string",
+        "minLength": 1
+      },
+      "amount": {
+        "type": "number"
+      },
+      "category": {
+        "type": "string",
+        "minLength": 1
+      },
+      "subcategory": {
+        "type": "string"
+      },
+      "confidence": {
+        "type": "number",
+        "minimum": 0
+      },
+      "match_type": {
+        "type": "string"
+      }
+    },
+    "required": ["date", "merchant", "amount", "category" ]
+  }
+}
